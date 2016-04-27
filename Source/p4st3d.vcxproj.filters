@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="base-client.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="client-entity-list.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="clientmode.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="engine-client.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="surface.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="playerinfo.h">
+      <Filter>structs</Filter>
+    </ClInclude>
+    <ClInclude Include="top.h">
+      <Filter>structs</Filter>
+    </ClInclude>
+    <ClInclude Include="hook.h">
+      <Filter>structs</Filter>
+    </ClInclude>
+    <ClInclude Include="usercmd.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="vector.h">
+      <Filter>structs</Filter>
+    </ClInclude>
+    <ClInclude Include="esp.h">
+      <Filter>hack</Filter>
+    </ClInclude>
+    <ClInclude Include="entity.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="panel.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="color.h">
+      <Filter>hack</Filter>
+    </ClInclude>
+    <ClInclude Include="matrix3x4.h">
+      <Filter>hack</Filter>
+    </ClInclude>
+    <ClInclude Include="render.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="ConVar.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="main.h" />
+    <ClInclude Include="poly.h">
+      <Filter>hack</Filter>
+    </ClInclude>
+    <ClInclude Include="math.h">
+      <Filter>hack</Filter>
+    </ClInclude>
+    <ClInclude Include="aim.h">
+      <Filter>hack</Filter>
+    </ClInclude>
+    <ClInclude Include="IEngineTrace.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="location.h">
+      <Filter>hack</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Classes">
+      <UniqueIdentifier>{3c6c61e1-f5d4-49f1-8d5d-acb21bf841bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="structs">
+      <UniqueIdentifier>{afa2f07b-4ec4-43fb-9bd4-20f74262402c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hack">
+      <UniqueIdentifier>{6fa8ff7e-47ae-454a-959c-4f1d5b52012d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
