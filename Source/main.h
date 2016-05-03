@@ -1,3 +1,4 @@
+#define DEG2RAD( x ) ( ( float )( x ) * ( float )( ( float )( M_PI ) / 180.0f ) )
 #include <windows.h>
 #include <intrin.h>
 #include "top.h"
@@ -17,7 +18,6 @@
 #include "IEngineTrace.h"
 
 #define validptr(p) (p != NULL && p != nullptr)
-CUserCmd* GUserCmd = NULL;
 CTools * Tools;
 IPanel * Panel;
 ISurface * Surface;
@@ -31,7 +31,8 @@ IClientEntityList * ClientEntityList;
 /* cheat */
 #include "esp.h"
 #include "aim.h"
-#include "location.h"
+#include "misc.h"
+#include "antiaim.h"
 
 int ScreenWidth;
 int ScreenHeight;

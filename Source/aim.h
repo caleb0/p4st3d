@@ -3,27 +3,29 @@ bool silent = true;
 class CAim {
 
 public: 
-	void Think(CBaseEntity* Local) {
+	void Think(CUserCmd* pCmd, CBaseEntity* Local) {
 		if (!GetAsyncKeyState(VK_XBUTTON2)) return;
 		if (Local->GetHealth() <= 0) return;
 		static Angle angAimAngles;
 		static int iClosestIndex;
-		iClosestIndex = ClosestAngle(angAimAngles, Local);
+		iClosestIndex = ClosestAngle(pCmd,angAimAngles, Local);
 		if (iClosestIndex != -1) {
 			angAimAngles.x -= (Local->GetPunch().x * 2.f);
 			angAimAngles.y -= (Local->GetPunch().y * 2.f);
 
+			Angle nextAngle;
+			bool shouldShoot = AimStep(pCmd->ViewAngles, angAimAngles, nextAngle);
 
-			GUserCmd->ViewAngles = angAimAngles;
-			GUserCmd->ViewAngles.Normalize();
-			ClampAngles(GUserCmd->ViewAngles);
-
-			GUserCmd->ForwardMove = 0;
-			GUserCmd->SideMove = 0;
-			GUserCmd->UpMove = 0;
-
-			GUserCmd->Buttons |= IN_DUCK;
-			GUserCmd->Buttons |= IN_ATTACK;
+			pCmd->ViewAngles = nextAngle;
+			
+			if (shouldShoot) {
+				pCmd->ForwardMove = 0;
+				pCmd->SideMove = 0;
+				pCmd->UpMove = 0;
+				pCmd->Buttons |= IN_DUCK;
+				pCmd->Buttons |= IN_ATTACK;
+			}
+			
 		}
 
 	}
@@ -44,7 +46,7 @@ public:
 
 		return angSmooth;
 	}
-	int ClosestAngle(CVector& angDestination, CBaseEntity* Local) {
+	int ClosestAngle(CUserCmd* pCmd, CVector& angDestination, CBaseEntity* Local) {
 		static CVector vecLocalPos;
 		static CVector vecEntityPos;
 		int iClosestIndex = -1;
@@ -56,7 +58,7 @@ public:
 			vecEntityPos = Entity->GetBonePosition(6);
 			CalcAngle(vecLocalPos, vecEntityPos, angAimAngles[i]);
 			angAimAngles[i].Normalize();
-			float flDifference = GUserCmd->ViewAngles.Difference(angAimAngles[i]);
+			float flDifference = pCmd->ViewAngles.Difference(angAimAngles[i]);
 			if (flDifference < 360.f) {
 				iClosestIndex = i;
 			}
@@ -101,8 +103,8 @@ public:
 	bool AimStep(Angle angSource, Angle angDestination, Angle &angOut)
 	{
 		angDestination.Normalize();
-		Angle angDelta = (angDestination - angSource).Normalize();;
-		int iStepAmount = 15.f;
+		Angle angDelta = (angDestination - angSource).Normalize();
+		int iStepAmount = 15.f; // above 15 gets me kicked.
 		bool bXFinished = false;
 		bool bYFinished = false;
 
@@ -115,8 +117,6 @@ public:
 			bXFinished = true;
 			angSource.x = angDestination.x;
 		}
-
-		GUserCmd->ViewAngles.Normalize();
 
 		if (angDelta.y > iStepAmount)
 			angSource.y += iStepAmount;
@@ -133,39 +133,18 @@ public:
 		angOut = angSource;
 
 		return bXFinished && bYFinished;
-
-		/*angDestination.Normalize();
-		Angle angDelta = (angDestination - angSource).Normalize();;
-		static float stepamount = 10.f;
-		bool bXFinished = true;
-		bool bYFinished = true;
-
-		angSource.x += Util::Clamp(angDelta.x, -stepamount, stepamount);
-		angSource.y += Util::Clamp(angDelta.y, -stepamount, stepamount);
-
-		if ((angDelta.x < -stepamount) || (angDelta.x > stepamount))
-		bXFinished = false;
-
-		if ((angDelta.y < -stepamount) || (angDelta.y > stepamount))
-		bXFinished = false;
-
-		angSource.Normalize();
-
-		angOut = angSource;
-
-		return bXFinished && bYFinished;*/
 	}
 };
 
 class CTrigger {
 public: 
-	void Think(CBaseEntity* Local) {
+	void Think(CBaseEntity* Local, CUserCmd* pCmd) {
 		if (!GetAsyncKeyState(VK_XBUTTON1)) return;
 		if (Local->GetHealth() <= 0) return;
 		for (int i = 0; i < 64; i++) {
 			CBaseEntity* currentEntity = (CBaseEntity*)ClientEntityList->GetClientEntity(i);
 			if (isValidTarget(currentEntity, Local)) {
-				GUserCmd->Buttons |= IN_ATTACK;
+				pCmd->Buttons |= IN_ATTACK;
 			}
 		}
 

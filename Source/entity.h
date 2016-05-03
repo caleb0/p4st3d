@@ -85,7 +85,7 @@ public:
 		vec.z = bones.z;
 		return vec;
 	}
-	std::string GetLastPlace() {
-		return std::string((const char*) this + 0x3594); //m_szLastPlaceName
+	char* GetLastPlace() {
+		return ((char*) this + 0x3594); //m_szLastPlaceName
 	}
 };

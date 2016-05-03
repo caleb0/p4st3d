@@ -68,7 +68,10 @@
     <ClInclude Include="IEngineTrace.h">
       <Filter>Classes</Filter>
     </ClInclude>
-    <ClInclude Include="location.h">
+    <ClInclude Include="antiaim.h">
+      <Filter>hack</Filter>
+    </ClInclude>
+    <ClInclude Include="misc.h">
       <Filter>hack</Filter>
     </ClInclude>
   </ItemGroup>

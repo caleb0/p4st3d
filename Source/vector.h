@@ -2,6 +2,9 @@
 
 #include "top.h"
 
+#define M_PI 3.14159265358979323846f
+
+
 class CVector
 {
 public:
@@ -14,6 +17,22 @@ public:
 		this->y = y;
 		this->z = z;
 	}
+	void Init(float _x = 0, float _y = 0, float _z = 0)
+	{
+		this->x = _x;
+		this->y = _y;
+		this->z = _z;
+	}
+
+	float& operator[](int i)
+	{
+		return ((float*)this)[i];
+	}
+	float operator[](int i) const
+	{
+		return ((float*)this)[i];
+	}
+
 
 	CVector operator + ( const CVector& In )
 	{
@@ -228,6 +247,30 @@ private:
 	}
 	
 };
+void VectorAngles3D(const CVector&vecForward, CVector&vecAngles)
+{
+	CVector vecView;
+	if (vecForward.y == 0.f && vecForward.x == 0.f)
+	{
+		vecView.x = 0.f;
+		vecView.y = 0.f;
+	}
+	else
+	{
+		vecView.y = atan2(vecForward.y, vecForward.x) * 180.f / M_PI;
+
+		if (vecView.y < 0.f)
+			vecView.y += 360;
+
+		vecView.z = sqrt(vecForward.x * vecForward.x + vecForward.y * vecForward.y);
+
+		vecView.x = atan2(vecForward.z, vecView.z) * 180.f / M_PI;
+	}
+
+	vecAngles.x = -vecView.x;
+	vecAngles.y = vecView.y;
+	vecAngles.z = 0.f;
+}
 
 class VectorAligned : public CVector
 {
@@ -243,3 +286,44 @@ public:
 
 	float w;
 };
+void AngleVectors(const CVector angles, float* forward, float* right, float* up)
+{
+	float angle;
+	static float sp, sy, cp, cy;
+
+	angle = angles[0] * (M_PI / 180.f);
+	sp = sin(angle);
+	cp = cos(angle);
+
+	angle = angles[1] * (M_PI / 180.f);
+	sy = sin(angle);
+	cy = cos(angle);
+
+	if (forward)
+	{
+		forward[0] = cp * cy;
+		forward[1] = cp * sy;
+		forward[2] = -sp;
+	}
+	if (right || up)
+	{
+		static float sr, cr;
+
+		angle = angles[2] * (M_PI / 180.f);
+		sr = sin(angle);
+		cr = cos(angle);
+
+		if (right)
+		{
+			right[0] = -1 * sr * sp * cy + -1 * cr * -sy;
+			right[1] = -1 * sr * sp * sy + -1 * cr *cy;
+			right[2] = -1 * sr * cp;
+		}
+		if (up)
+		{
+			up[0] = cr * sp *cy + -sr * -sy;
+			up[1] = cr * sp *sy + -sr * cy;
+			up[2] = cr * cp;
+		}
+	}
+}

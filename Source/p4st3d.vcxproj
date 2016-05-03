@@ -128,7 +128,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>C:\Users\rubix\Desktop;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies);PolyCode.lib</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies);</AdditionalDependencies>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
@@ -155,6 +155,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="aim.h" />
+    <ClInclude Include="antiaim.h" />
     <ClInclude Include="base-client.h" />
     <ClInclude Include="client-entity-list.h" />
     <ClInclude Include="clientmode.h" />
@@ -172,7 +173,7 @@
     <ClInclude Include="playerinfo.h" />
     <ClInclude Include="poly.h" />
     <ClInclude Include="render.h" />
-    <ClInclude Include="location.h" />
+    <ClInclude Include="misc.h" />
     <ClInclude Include="surface.h" />
     <ClInclude Include="top.h" />
     <ClInclude Include="usercmd.h" />

@@ -38,6 +38,7 @@ void __stdcall HookedPaintTraverse( int VGUIPanel, bool ForceRepaint, bool Allow
 		{
 			ESP->Think(LocalPlayer);
 			Render->DrawRect(x - 3, y - 3, 6, 6, CColor(255, 255, 255, 255));
+			ShowRank();
 		}
 		else {
 			Render->DrawRainbow(0, 0, ScreenWidth, 2, 0.003f, rainbow);
@@ -45,45 +46,66 @@ void __stdcall HookedPaintTraverse( int VGUIPanel, bool ForceRepaint, bool Allow
 
 	}
 }
+int counter = 0;
 /* cmove hook function */
 bool __stdcall HookedCreateMove( float SampleTime, CUserCmd* UserCmd )
 {
+
+	/*void *vBase, *vInputBase;
+	__asm mov vBase, ebp;
+	vInputBase = (void*)vBase;
+	bSendPacket = *(char**)vInputBase - 0x1C;	 // copypasted from moneybot copypasted from m3mehook
+	*bSendPacket = TRUE;
+	
+	if (GetAsyncKeyState(VK_XBUTTON1)) {
+		if (counter < 10) {
+			*bSendPacket = FALSE;
+		}
+		else {
+			*bSendPacket = TRUE;
+			counter = 0;
+		}
+		counter++;
+	}*/
+
 	if ( !UserCmd->CommandNumber )
 		return true;
-	GUserCmd = UserCmd;
+
 	LocalPlayer = ( CBaseEntity* ) ClientEntityList->GetClientEntity( EngineClient->GetLocalPlayer( ) );
 	if ( !LocalPlayer )
 		return true;
 
-	void *vBase, *vInputBase;
-	__asm mov vBase, ebp;
-	vInputBase = (void*)vBase;
-	bSendPacket = *(char**)vInputBase - 0x1C; // copypasted from moneybot
-	*bSendPacket = TRUE;
-
-	maxEntities = EngineClient->GetMaxClients();
-
-	Aim->Think(LocalPlayer);
-	Trigger->Think(LocalPlayer);
-	if ( UserCmd->Buttons & IN_JUMP )
-		if ( !( LocalPlayer->GetFlags( ) & FL_ONGROUND ) )
-		{ 
+	if (UserCmd->Buttons & IN_JUMP) {
+		if (!(LocalPlayer->GetFlags() & FL_ONGROUND))
+		{
 			if (UserCmd->MousedX < 0) {
 				UserCmd->SideMove = -450.f;
-			} else if (UserCmd->MousedX > 0) {
+			}
+			else if (UserCmd->MousedX > 0) {
 				UserCmd->SideMove = 450.f;
 			}
 			UserCmd->Buttons &= ~IN_JUMP;
 		}
-
-		static ConVar* name = pCvar->FindVar("name");
-		*(int*)((DWORD)&name->fnChangeCallback + 0xC) = NULL;
-		if (name != NULL) {
-			name->SetValue("\nVALVE");
-		}
+	}
+	
+	Aim->Think(UserCmd, LocalPlayer);
+	/*if (!UserCmd->Buttons & IN_ATTACK && !UserCmd->Buttons & IN_ATTACK2) {
+		DoAntiAim(UserCmd);
+	}*/
+	maxEntities = EngineClient->GetMaxClients();
+	
+	
+	/*static ConVar* name = pCvar->FindVar("name");
+	*(int*)((DWORD)&name->fnChangeCallback + 0xC) = NULL;
+	if (name != NULL) {
+		name->SetValue("\nVALVE");
+	}*/
 	
 
 	getRecoil(LocalPlayer->GetPunch());
+
+	UserCmd->ViewAngles.Normalize();
+	ClampAngles(UserCmd->ViewAngles);
 	return false;
 }
 
