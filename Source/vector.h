@@ -1,9 +1,15 @@
 #pragma once
-
-#include "top.h"
-
+#include <math.h>
 #define M_PI 3.14159265358979323846f
 
+struct Vector2D
+{
+public:
+	float x, y;
+
+	Vector2D() {}
+	Vector2D(float x_, float y_) { x = x_; y = y_; }
+};
 
 class CVector
 {
@@ -70,6 +76,16 @@ public:
 	{
 		return (this->x * this->x + this->y * this->y + this->z * this->z);
 	}
+	CVector AnglesToPixels(CVector qViewAngles, CVector qAimAngles)
+	{
+		CVector qDelta = qViewAngles - qAimAngles;
+
+		qDelta.x /= 0.022f;
+		qDelta.y /= 0.022f;
+
+		return CVector(qDelta.y, -qDelta.x, 0.0f);
+	}
+	
 };
 
 class Angle : public CVector
@@ -225,6 +241,16 @@ public:
 
 		angles.z = 0;
 	}
+	Angle AnglesToPixels(Angle qViewAngles, Angle qAimAngles)
+	{
+		Angle qDelta = qViewAngles - qAimAngles;
+		ClampAngles(qDelta);
+
+		qDelta.x /= 0.022f;
+		qDelta.y /= 0.022f;
+
+		return Angle(qDelta.y, -qDelta.x, 0.0f);
+	}
 	/*
 	nigga that shit broken af
 	float Difference(Angle dest)
@@ -326,4 +352,46 @@ void AngleVectors(const CVector angles, float* forward, float* right, float* up)
 			up[2] = cr * cp;
 		}
 	}
+}
+
+
+void normalize(CVector angles) {
+
+	while (angles.x > 180.0f)
+		angles.x -= 360.0f;
+
+	while (angles.x < -180.0f)
+		angles.x += 360.0f;
+
+	while (angles.y > 180.0f)
+		angles.y -= 360.0f;
+
+	while (angles.y < -180.0f)
+		angles.y += 360.0f;
+
+	while (angles.z > 180.0f)
+		angles.z -= 360.0f;
+
+	while (angles.z < -180.0f)
+		angles.z += 360.0f;
+
+}
+
+CVector ClampAngles(CVector angles) {
+
+	while (angles.y > 180)
+		angles.y -= 360;
+
+	while (angles.y < -180)
+		angles.y += 360;
+
+	if (angles.x > 89.0f)
+		angles.x = 89.0f;
+
+	if (angles.x < -89.0f)
+		angles.x = -89.0f;
+
+	angles.z = 0;
+	return angles;
+
 }

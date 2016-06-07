@@ -25,6 +25,10 @@ public:
 		typedef int( __thiscall* _GetLocalPlayer )( void* );
 		return EmulateVirtual<_GetLocalPlayer>( this, 12 )( this );
 	}
+	void GetViewAngles(CVector& Angles) {
+		typedef void(__thiscall* _GetViewAngles)(void*, CVector&);
+		return EmulateVirtual<_GetViewAngles>(this, 18)(this, Angles);
+	}
 	void SetViewAngles(CVector& Angles)
 	{
 		typedef void(__thiscall* _SetViewAngles)(void*, CVector&);

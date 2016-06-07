@@ -27,7 +27,7 @@ public:
 
 		CVector Screen, Head;
 		int spectators = 0;
-		for ( int i = 0; i < 64; ++i )
+		for ( int i = 0; i < maxEntities; ++i )
 		{
 			
 			CBaseEntity* Entity = ( CBaseEntity* ) ClientEntityList->GetClientEntity( i );		
@@ -101,15 +101,15 @@ public:
 
 	}
 
-	__forceinline bool WorldToScreen( CVector In, CVector& Out, Matrix3x4_t ViewMatrix ) // fix; move matrix to this instead of passing? might look nicer.
+	__forceinline bool WorldToScreen(CVector In, CVector& Out, Matrix3x4_t ViewMatrix) // fix; move matrix to this instead of passing? might look nicer.
 	{
-		Out.x = ViewMatrix.Matrix[ 0 ] * In.x + ViewMatrix.Matrix[ 1 ] * In.y + ViewMatrix.Matrix[ 2 ] * In.z + ViewMatrix.Matrix[ 3 ];
+		Out.x = ViewMatrix.Matrix[0] * In.x + ViewMatrix.Matrix[1] * In.y + ViewMatrix.Matrix[2] * In.z + ViewMatrix.Matrix[3];
 
-		Out.y = ViewMatrix.Matrix[ 4 ] * In.x + ViewMatrix.Matrix[ 5 ] * In.y + ViewMatrix.Matrix[ 6 ] * In.z + ViewMatrix.Matrix[ 7 ];
+		Out.y = ViewMatrix.Matrix[4] * In.x + ViewMatrix.Matrix[5] * In.y + ViewMatrix.Matrix[6] * In.z + ViewMatrix.Matrix[7];
 
-		Out.z = ViewMatrix.Matrix[ 12 ] * In.x + ViewMatrix.Matrix[ 13 ] * In.y + ViewMatrix.Matrix[ 14 ] * In.z + ViewMatrix.Matrix[ 15 ];
+		Out.z = ViewMatrix.Matrix[12] * In.x + ViewMatrix.Matrix[13] * In.y + ViewMatrix.Matrix[14] * In.z + ViewMatrix.Matrix[15];
 
-		if ( Out.z < 0.01f )
+		if (Out.z < 0.01f)
 			return false;
 
 		float Inverse = 1.f / Out.z;
@@ -119,7 +119,7 @@ public:
 
 		int Width, Height;
 
-		EngineClient->GetScreenSize( Width, Height );
+		EngineClient->GetScreenSize(Width, Height);
 
 		auto X = Width / 2;
 		auto Y = Height / 2;
@@ -132,7 +132,6 @@ public:
 
 		return true;
 	}
-
 	bool isSpectator(CBaseEntity* Entity, CBaseEntity* Local) {
 		if (!(Entity->GetTeam() == 2)) return false;
 		if (!(Entity->GetEyePosition() == Local->GetEyePosition())) return false;

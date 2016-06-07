@@ -1,102 +1,92 @@
 #pragma once
+#include <map>
 
-#include "top.h"
-
-class CHook
-{
+typedef DWORD** PPDWORD;
+class VFTableHook {
+	VFTableHook(const VFTableHook&) = delete;
 public:
-	CHook( void )
-	{
-		memset( this, 0, sizeof( CHook ) );
+	VFTableHook(PPDWORD ppClass, bool bReplace) {
+		m_ppClassBase = ppClass;
+		m_bReplace = bReplace;
+		if (bReplace) {
+			m_pOriginalVMTable = *ppClass;
+			uint32_t dwLength = CalculateLength();
+
+			m_pNewVMTable = new DWORD[dwLength];
+			memcpy(m_pNewVMTable, m_pOriginalVMTable, dwLength * sizeof(DWORD));
+
+			DWORD old;
+			VirtualProtect(m_ppClassBase, sizeof(DWORD), PAGE_EXECUTE_READWRITE, &old);
+			*m_ppClassBase = m_pNewVMTable;
+			VirtualProtect(m_ppClassBase, sizeof(DWORD), old, &old);
+
+		}
+		else {
+			m_pOriginalVMTable = *ppClass;
+			m_pNewVMTable = *ppClass;
+		}
+	}
+	~VFTableHook() {
+		RestoreTable();
+		if (m_bReplace && m_pNewVMTable) delete[] m_pNewVMTable;
 	}
 
-	CHook( PDWORD* ppdwClassBase )
-	{
-		bInitialize( ppdwClassBase );
-	}
-
-	~CHook( void )
-	{
-		UnHook( );
-	}
-	bool bInitialize( PDWORD* ppdwClassBase )
-	{
-		m_ppdwClassBase = ppdwClassBase;
-		m_pdwOldVMT = *ppdwClassBase;
-		m_dwVMTSize = dwGetVMTCount( *ppdwClassBase );
-		m_pdwNewVMT = new DWORD[ m_dwVMTSize ];
-		memcpy( m_pdwNewVMT, m_pdwOldVMT, sizeof( DWORD ) * m_dwVMTSize );
-		*ppdwClassBase = m_pdwNewVMT;
-		return true;
-	}
-	bool bInitialize( PDWORD** pppdwClassBase ) // fix for pp
-	{
-		return bInitialize( *pppdwClassBase );
-	}
-
-	void UnHook( void )
-	{
-		if ( m_ppdwClassBase )
-		{
-			*m_ppdwClassBase = m_pdwOldVMT;
+	void RestoreTable() {
+		if (m_bReplace) {
+			DWORD old;
+			VirtualProtect(m_ppClassBase, sizeof(DWORD), PAGE_EXECUTE_READWRITE, &old);
+			*m_ppClassBase = m_pOriginalVMTable;
+			VirtualProtect(m_ppClassBase, sizeof(DWORD), old, &old);
+		}
+		else {
+			for (auto& pair : m_vecHookedIndexes) {
+				Unhook(pair.first);
+			}
 		}
 	}
 
-	void ReHook( void )
-	{
-		if ( m_ppdwClassBase )
-		{
-			*m_ppdwClassBase = m_pdwNewVMT;
+	template<class Type>
+	Type Hook(uint32_t index, Type fnNew) {
+		DWORD dwOld = (DWORD)m_pOriginalVMTable[index];
+		m_pNewVMTable[index] = (DWORD)fnNew;
+		m_vecHookedIndexes.insert(std::make_pair(index, (DWORD)dwOld));
+		return (Type)dwOld;
+	}
+	void Unhook(uint32_t index) {
+		auto it = m_vecHookedIndexes.find(index);
+		if (it != m_vecHookedIndexes.end()) {
+			m_pNewVMTable[index] = (DWORD)it->second;
+			m_vecHookedIndexes.erase(it);
 		}
 	}
 
-	int iGetFuncCount( void )
-	{
-		return ( int ) m_dwVMTSize;
-	}
-
-	DWORD dwGetMethodAddress( int Index )
-	{
-		if ( Index >= 0 && Index <= ( int ) m_dwVMTSize && m_pdwOldVMT != NULL )
-		{
-			return m_pdwOldVMT[ Index ];
-		}
-		return NULL;
-	}
-
-	PDWORD pdwGetOldVMT( void )
-	{
-		return m_pdwOldVMT;
-	}
-
-	DWORD dwHookMethod( DWORD dwNewFunc, unsigned int iIndex )
-	{
-		if ( m_pdwNewVMT && m_pdwOldVMT && iIndex <= m_dwVMTSize && iIndex >= 0 )
-		{
-			m_pdwNewVMT[ iIndex ] = dwNewFunc;
-			return m_pdwOldVMT[ iIndex ];
-		}
-
-		return NULL;
+	template<class Type>
+	Type GetOriginal(uint32_t index) {
+		return (Type)m_pOriginalVMTable[index];
 	}
 
 private:
+	uint32_t CalculateLength() {
+		uint32_t i = 0;
+		if (!m_pOriginalVMTable) return 0;
 
-	DWORD dwGetVMTCount( PDWORD pdwVMT )
-	{
-		DWORD dwIndex = 0;
-
-		for ( dwIndex = 0; pdwVMT[ dwIndex ]; dwIndex++ )
-		{
-			if ( IsBadCodePtr( ( FARPROC ) pdwVMT[ dwIndex ] ) )
-			{
-				break;
-			}
+		while (m_pOriginalVMTable[i]) {
+			i++;
 		}
-		return dwIndex;
+
+		//for (dwIndex = 0; m_pOriginalVMTable[dwIndex]; dwIndex++) {
+		//	if (IsBadCodePtr((FARPROC)m_pOriginalVMTable[dwIndex])) {
+		//		break;
+		//	}
+		//}
+		return i;
 	}
 
-	PDWORD*	m_ppdwClassBase;
-	PDWORD	m_pdwNewVMT, m_pdwOldVMT;
-	DWORD	m_dwVMTSize;
-}; extern CHook * PanelHook; extern CHook * CreateMoveHook;
+private:
+	std::map<uint32_t, DWORD> m_vecHookedIndexes;
+
+	PPDWORD m_ppClassBase;
+	PDWORD m_pOriginalVMTable;
+	PDWORD m_pNewVMTable;
+	bool m_bReplace;
+}; extern VFTableHook * PanelHook; extern VFTableHook * CreateMoveHook; extern VFTableHook * OverrideMouseHook;

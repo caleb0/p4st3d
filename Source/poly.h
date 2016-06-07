@@ -24,7 +24,6 @@
 #define _WIN32_WINNT 0x0501
 #define _WIN32_WINDOWS 0x0410
 #define _WIN32_IE 0x0600
-#include "windows.h"
 /*
 *   Copyright © May-30-2010 by learn_more
 *   SimpleObf.h is part of the project 'SimpleObfuscation'.

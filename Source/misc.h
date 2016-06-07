@@ -20,6 +20,7 @@ void LocationSpam() {
 
 }
 
+
 void ShowRank() {
 	static auto RevealRank = reinterpret_cast<bool(__cdecl*)(int*)>(Tools->FindTextPattern("client.dll", "55 8B EC 8B 0D ? ? ? ? 68"));
 	int fArray[3] = { 0,0,0 };

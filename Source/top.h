@@ -1,25 +1,24 @@
 #pragma once
 
-#pragma region includes
 
-#include <Windows.h>
-#include <iostream>
 #include <fstream>
-#include <Psapi.h>
-#include "usercmd.h"
-
-#pragma endregion
 
 #pragma region protos
 
 typedef void*	( *Interface )( char* _Name, int Return );
 
-typedef void( __thiscall *PaintTraverse )( void*, unsigned int, bool, bool );
+typedef void( __thiscall *fnPaintTraverse )( void*, unsigned int, bool, bool );
 
-typedef bool( __thiscall *CreateMove )( void*, float, CUserCmd* );
+typedef bool( __thiscall *fnCreateMove )( void*, float, CUserCmd* );
+
+typedef void(__thiscall *fnOverrideMouseHook)(void*, float *x, float *y);
+
+typedef void*(__stdcall* fnDrawModelExecute)(void*, void*, const ModelRenderInfo_t&, Matrix3x4_t*);
 
 typedef void(__cdecl* MsgFn)(const char* msg, va_list);
 #pragma endregion
+
+
 
 class CTools
 {
@@ -54,7 +53,7 @@ public:
 		}
 		return ModuleHandle;
 	}
-
+	
 	DWORD FindPattern(std::string moduleName, BYTE* Mask, char* szMask)
 	{
 		DWORD Address = WaitOnModuleHandle(moduleName.c_str());

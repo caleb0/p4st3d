@@ -166,14 +166,15 @@
     <ClInclude Include="esp.h" />
     <ClInclude Include="hook.h" />
     <ClInclude Include="IEngineTrace.h" />
+    <ClInclude Include="ivmodelrender.h" />
     <ClInclude Include="main.h" />
-    <ClInclude Include="math.h" />
     <ClInclude Include="matrix3x4.h" />
     <ClInclude Include="panel.h" />
     <ClInclude Include="playerinfo.h" />
     <ClInclude Include="poly.h" />
     <ClInclude Include="render.h" />
     <ClInclude Include="misc.h" />
+    <ClInclude Include="studio.h" />
     <ClInclude Include="surface.h" />
     <ClInclude Include="top.h" />
     <ClInclude Include="usercmd.h" />

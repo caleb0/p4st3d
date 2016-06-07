@@ -5,31 +5,22 @@ void AntiAim(CUserCmd* pCmd) {
 }
 void SlowSpin(CUserCmd *pCmd)
 {
-	int random = rand() % 100;
-	int random2 = rand() % 1000;
+	pCmd->ViewAngles.x = -88;
+	int random = rand() % 10;
 
 	static bool dir;
-	static float current_y = pCmd->ViewAngles.y;
+	static float change;
 
-	if (random == 1) dir = !dir;
+	change += 10;
+	change += random;
 
-	if (dir)
-		current_y += 5;
-	else
-		current_y -= 5;
-
-	pCmd->ViewAngles.y = current_y;
-
-	if (random == random2)
-		pCmd->ViewAngles.y += random;
+	pCmd->ViewAngles.y += change;
 
 }
 void FastSpint(CUserCmd *pCmd)
 {
-	if (pCmd->Buttons & IN_ATTACK || pCmd->Buttons & IN_ATTACK2 || pCmd->Buttons & IN_ATTACK3) return;
-	int random = 15;
-	static float current_y = pCmd->ViewAngles.y;
-	current_y += random;
+	float goldern = 360 / 1.61803398875;
+	static float current_y = pCmd->ViewAngles.y + goldern;
 	pCmd->ViewAngles.y = current_y;
 }
 void Pitch(CUserCmd* pCmd) {
@@ -109,6 +100,9 @@ void ReverseMovement(CUserCmd* pCmd) {
 	pCmd->ForwardMove = fMove * -1;
 	pCmd->SideMove = sMove * -1;
 }
+void fakedown(CUserCmd* pCmd) {
+	pCmd->ViewAngles.x = 89.00f;
+}
 void DoAntiAim(CUserCmd* pCmd) {
 	CVector vMove(pCmd->ForwardMove, pCmd->SideMove, pCmd->UpMove);
 	float flSpeed = sqrt(vMove.x * vMove.x + vMove.y * vMove.y), flYaw;
@@ -116,9 +110,8 @@ void DoAntiAim(CUserCmd* pCmd) {
 	CVector vRealView(pCmd->ViewAngles);
 	VectorAngles3D(vMove, vMove2);
 
-	SlowSpin(pCmd);
-
-
+	//SlowSpin(pCmd);
+	FastSpint(pCmd);
 	//fix movement
 	flYaw = DEG2RAD(pCmd->ViewAngles.y - vRealView.y + vMove2.y);
 	pCmd->ForwardMove = cos(flYaw) * flSpeed;
